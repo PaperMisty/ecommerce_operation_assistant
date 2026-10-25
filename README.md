@@ -100,7 +100,7 @@ graph TB
 
     UserBrowser -->|443 HTTPS| Nginx
     Nginx -->|SPA 静态文件| ViteApp
-    Nginx -->|反向代理 (proxy_buffering off)| APIRouter
+    Nginx -->|反向代理 proxy_buffering off| APIRouter
     ViteApp --> PiniaStore
     APIRouter --> SessionAuth
     APIRouter --> RulesEngine
