@@ -1,0 +1,36 @@
+nohup: 忽略输入
+已完成【电商运营助手】生产级 Nginx 配置与证书部署文档的交付。
+
+### 交付文件清单
+
+1. 配置文件：[`ecommerce.conf`](file:///home/ubuntu/projects/ecommerce_operation_assistant/deploy/nginx/ecommerce.conf)
+2. 指南文档：[`README.md`](file:///home/ubuntu/projects/ecommerce_operation_assistant/deploy/nginx/README.md)
+
+---
+
+### 技术规范落实细节
+
+#### 1. 流量与传输安全
+* **强制 HTTPS**：80 端口使用 `301` 永久重定向到对应 HTTPS URL，并保留 `/.well-known/acme-challenge/` 路径以支持 Let's Encrypt 证书验证。
+* **现代加密协议**：限制仅启用 `TLSv1.2` 与 `TLSv1.3`，禁用不安全的过时协议。
+* **HTTP/2 开启**：配置 `http2 on;`（兼容支持 HTTP/2 连接多路复用）。
+* **标准证书占位**：
+  * 公钥证书：`/etc/nginx/ssl/ecommerce.crt`
+  * 私钥路径：`/etc/nginx/ssl/ecommerce.key`
+* **安全响应标头**：配置 `HSTS`、`X-Content-Type-Options: nosniff`、`X-Frame-Options: SAMEORIGIN`、`X-XSS-Protection` 与 `Referrer-Policy`。
+
+#### 2. 前后端路由与反向代理
+* **前端静态托管**：
+  * 静态根路径指向 `/home/ubuntu/projects/ecommerce_operation_assistant/frontend/dist`。
+  * 配置 `try_files $uri $uri/ /index.html;` 支持 React/Vue 单页应用的 HTML5 History 路由模式。
+  * 针对带有哈希的静态资源（js/css/img）开启 30 天强缓存，入口 `index.html` 配置无缓存以保证即时发布。
+* **后端 API 代理**：
+  * 将 `/api/` 转发至 `http://127.0.0.1:8001`。
+  * 传递请求头：`Host`、`X-Real-IP`、`X-Forwarded-For`、`X-Forwarded-Proto https`，使 FastAPI/Uvicorn 能够精确感知客户端的 HTTPS 请求，安全下发带有 `Secure` 和 `HttpOnly` 属性的 Cookie。
+  * 设置 `proxy_buffering off;`，彻底禁用反代缓冲，保证大模型流式响应（SSE / Server-Sent Events）实现零延迟打字机推送。
+* **Gzip 压缩**：对 `text/css`、`application/javascript`、`application/json`、`image/svg+xml` 等格式启用 `gzip_comp_level 6` 动态压缩。
+
+#### 3. 部署与运维指南 (`README.md`)
+* **本地开发**：集成 `mkcert` 工具，提供 3 分钟生成不受浏览器警告拦截的本地受信 CA 与自签证书流程，包含 WSL2 与 Windows 宿主机的根证书信任说明。
+* **生产环境**：提供使用 `certbot` 及 `python3-certbot-nginx` 自动化申请 Let's Encrypt 证书的两种模式（Nginx 插件与 Webroot 映射），并配置定时自动续期与平滑重载钩子。
+* **运维指令与权限避坑**：提供 `nginx -t`、`systemctl reload nginx` 命令，以及针对 `home` 目录排查 403 Forbidden 的权限赋权指南。
