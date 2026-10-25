@@ -1,0 +1,7 @@
+
+# === AI Workspace & Environment Settings ===
+.*
+!.gitignore
+node_modules
+
+
