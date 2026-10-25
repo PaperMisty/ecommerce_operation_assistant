@@ -1,0 +1,23 @@
+name: ecommerce-operation-assistant
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: eoa-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-eoa_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-eoa_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-ecommerce_operation_assistant}
+    ports:
+      - "5432:5432"
+    volumes:
+      - eoa_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-eoa_user} -d ${POSTGRES_DB:-ecommerce_operation_assistant}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  eoa_postgres_data:

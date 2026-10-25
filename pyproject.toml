@@ -1,0 +1,28 @@
+[project]
+name = "ecommerce-operation-assistant"
+version = "0.1.0"
+description = "2.6 电商运营助手 - 基于 FastAPI + SQLAlchemy 2.0 Async + LangChain/LangGraph + Langfuse 的单品运营工作台"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "sqlalchemy[asyncio]>=2.0.35",
+    "asyncpg>=0.29.0",
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.5.0",
+    "python-multipart>=0.0.12",
+    "httpx[socks]>=0.27.2",
+    "itsdangerous>=2.2.0",
+    "bcrypt>=4.2.0",
+    "langchain-core>=0.3.0",
+    "langchain-openai>=0.2.0",
+    "langgraph>=0.2.0",
+    "langfuse>=2.50.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.24.0",
+]
